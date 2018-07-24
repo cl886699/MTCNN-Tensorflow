@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import cv2
 import os
-import numpy.random as npr
 from utils import IoU
 anno_file = "wider_face_train.txt"
 im_dir = "WIDER_train/images"
@@ -11,6 +10,7 @@ pos_save_dir = "12/positive"
 part_save_dir = "12/part"
 neg_save_dir = '12/negative'
 save_dir = "./12"
+
 if not os.path.exists(save_dir):
     os.mkdir(save_dir)
 if not os.path.exists(pos_save_dir):
@@ -23,28 +23,31 @@ if not os.path.exists(neg_save_dir):
 f1 = open(os.path.join(save_dir, 'pos_12.txt'), 'w')
 f2 = open(os.path.join(save_dir, 'neg_12.txt'), 'w')
 f3 = open(os.path.join(save_dir, 'part_12.txt'), 'w')
+
 with open(anno_file, 'r') as f:
     annotations = f.readlines()
 num = len(annotations)
-print "%d pics in total" % num
+
+print("%d pics in total" % num)
 p_idx = 0 # positive
 n_idx = 0 # negative
 d_idx = 0 # dont care
 idx = 0
 box_idx = 0
+
 for annotation in annotations:
     annotation = annotation.strip().split(' ')
     #image path
     im_path = annotation[0]
     #boxed change to float type
-    bbox = map(float, annotation[1:])
+    bbox = list(map(float, annotation[1:]))
     #gt
     boxes = np.array(bbox, dtype=np.float32).reshape(-1, 4)
     #load image
     img = cv2.imread(os.path.join(im_dir, im_path + '.jpg'))
     idx += 1
     if idx % 100 == 0:
-        print idx, "images done"
+        print(idx, "images done")
         
     height, width, channel = img.shape
 
@@ -52,10 +55,10 @@ for annotation in annotations:
     #1---->50
     while neg_num < 50:
         #neg_num's size [40,min(width, height) / 2],min_size:40 
-        size = npr.randint(12, min(width, height) / 2)
+        size = np.random.randint(12, min(width, height) / 2)
         #top_left
-        nx = npr.randint(0, width - size)
-        ny = npr.randint(0, height - size)
+        nx = np.random.randint(0, width - size)
+        ny = np.random.randint(0, height - size)
         #random crop
         crop_box = np.array([nx, ny, nx + size, ny + size])
         #cal iou
@@ -85,10 +88,10 @@ for annotation in annotations:
         if max(w, h) < 40 or x1 < 0 or y1 < 0:
             continue
         for i in range(5):
-            size = npr.randint(12, min(width, height) / 2)
+            size = np.random.randint(12, min(width, height) / 2)
             # delta_x and delta_y are offsets of (x1, y1)
-            delta_x = npr.randint(max(-size, -x1), w)
-            delta_y = npr.randint(max(-size, -y1), h)
+            delta_x = np.random.randint(max(-size, -x1), w)
+            delta_y = np.random.randint(max(-size, -y1), h)
             nx1 = int(max(0, x1 + delta_x))
             ny1 = int(max(0, y1 + delta_y))
             if nx1 + size > width or ny1 + size > height:
@@ -108,11 +111,11 @@ for annotation in annotations:
 	# generate positive examples and part faces
         for i in range(20):
             # pos and part face size [minsize*0.8,maxsize*1.25]
-            size = npr.randint(int(min(w, h) * 0.8), np.ceil(1.25 * max(w, h)))
+            size = np.random.randint(int(min(w, h) * 0.8), np.ceil(1.25 * max(w, h)))
 
             # delta here is the offset of box center
-            delta_x = npr.randint(-w * 0.2, w * 0.2)
-            delta_y = npr.randint(-h * 0.2, h * 0.2)
+            delta_x = np.random.randint(-w * 0.2, w * 0.2)
+            delta_y = np.random.randint(-h * 0.2, h * 0.2)
             #show this way: nx1 = max(x1+w/2-size/2+delta_x)
             nx1 = int(max(x1 + w / 2 + delta_x - size / 2, 0))
             #show this way: ny1 = max(y1+h/2-size/2+delta_y)
@@ -145,7 +148,7 @@ for annotation in annotations:
                 cv2.imwrite(save_file, resized_im)
                 d_idx += 1
         box_idx += 1
-	print "%s images done, pos: %s part: %s neg: %s"%(idx, p_idx, d_idx, n_idx)
+        print("%s images done, pos: %s part: %s neg: %s"%(idx, p_idx, d_idx, n_idx))		
 f1.close()
 f2.close()
 f3.close()

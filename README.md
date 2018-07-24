@@ -13,6 +13,12 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 * Cuda 8.0
 
 ## Prepare For Training Data
+### prepare Pnet data
+1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.
+2. Run `prepare_data/gen_12net_data.py` to generate training data(Face Detection Part) for **PNet**.
+3. Run `gen_imglist_pnet.py` to merge positive, negative and part data.
+4. Run `gen_PNet_tfrecords.py` to generate tfrecord for **PNet**.
+### prepare Rnet data
 1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.
 2. Download landmark training data from [here]((http://mmlab.ie.cuhk.edu.hk/archive/CNN_FacePoint.htm)),unzip and put them into `prepare_data` folder.
 3. Run `prepare_data/gen_12net_data.py` to generate training data(Face Detection Part) for **PNet**.

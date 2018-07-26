@@ -13,6 +13,17 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 * Cuda 8.0
 
 ## Prepare For Training Data
+### prepare Pnet data(no landmark data)
+1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.
+2. Run `prepare_data/gen_12net_data.py` to generate training data(Face Detection Part) for **PNet**.
+3. Run `gen_imglist_pnet.py` to merge positive, negative and part data.
+4. Run `gen_PNet_tfrecords.py` to generate tfrecord for **PNet**.
+### prepare Rnet data(no landmark data)
+1. After training **PNet**, run `gen_hard_example_R.py` to generate training data(Face Detection Part) for **RNet**.
+2. Run `gen_imglist_rnet.py` to merge positive, negative and part data.
+3. Run `gen_RNet_tfrecords.py` to generate tfrecords for **RNet**.(**you should run this script four times to generate tfrecords of neg,pos and part respectively**)
+
+### prepare Rnet data
 1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.
 2. Download landmark training data from [here]((http://mmlab.ie.cuhk.edu.hk/archive/CNN_FacePoint.htm)),unzip and put them into `prepare_data` folder.
 3. Run `prepare_data/gen_12net_data.py` to generate training data(Face Detection Part) for **PNet**.
@@ -28,6 +39,8 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 13. Run `gen_imglist_onet.py` to merge two parts of training data.
 14. Run `gen_ONet_tfrecords.py` to generate tfrecords for **ONet**.(**you should run this script four times to generate tfrecords of neg,pos,part and landmark respectively**)
 
+## training
+1. Run `train_models/train_PNet.py` to train PNet.
 ## Some Details
 * When training **PNet**,I merge four parts of data(pos,part,landmark,neg) into one tfrecord,since their total number radio is almost 1:1:1:3.But when training **RNet** and **ONet**,I generate four tfrecords,since their total number is not balanced.During training,I read 64 samples from pos,part and landmark tfrecord and read 192 samples from neg tfrecord to construct mini-batch.
 * It's important for **PNet** and **RNet** to keep high recall radio.When using well-trained **PNet** to generate training data for **RNet**,I can get 14w+ pos samples.When using well-trained **RNet** to generate training data for **ONet**,I can get 19w+ pos samples.

@@ -14,15 +14,15 @@ def train_PNet(base_dir, prefix, end_epoch, display, lr):
     :return:
     """
     net_factory = P_Net
-    train(net_factory,prefix, end_epoch, base_dir, display=display, base_lr=lr)
+    train(net_factory, prefix, end_epoch, base_dir, display=display, base_lr=lr)
 
 if __name__ == '__main__':
     #data path
-    base_dir = '../prepare_data/imglists/PNet'
-    model_name = 'MTCNN'
+    base_dir = '../prepare_data/imglists/PNet' # training data directory.
+    model_name = 'MTCNN_yin'
     #model_path = '../data/%s_model/PNet/PNet' % model_name
     #with landmark
-    model_path = '../data/%s_model/PNet_landmark/PNet' % model_name
+    model_path = '../data/%s_model/PNet' % model_name
             
     prefix = model_path
     end_epoch = 30

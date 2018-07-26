@@ -19,6 +19,7 @@ def read_annotation(base_dir, label_path):
     read label file
     :param dir: path
     :return:
+	(x1, y1, w, h) ---> (x1, y1, x2, y2)
     """
     data = dict()
     images = []

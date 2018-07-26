@@ -4,8 +4,7 @@ import numpy as np
 import sys
 sys.path.append("../")
 from train_models.MTCNN_config import config
-from nms import py_nms
-
+from Detection.nms import py_nms
 
 class MtcnnDetector(object):
 
@@ -81,7 +80,7 @@ class MtcnnDetector(object):
         ----------
             cls_map: numpy array , n x m 
                 detect score for each position
-            reg: numpy array , n x m x 4
+            reg: numpy array, n x m x 4
                 bbox
             scale: float number
                 scale of this detection
@@ -215,7 +214,7 @@ class MtcnnDetector(object):
 
             if boxes.size == 0:
                 continue
-            keep = py_nms(boxes[:, :5], 0.5, 'Union')
+            keep = py_nms(boxes[:, :5], 0.5, 'Union') # apply nms to one scale input.
             boxes = boxes[keep]
             all_boxes.append(boxes)
 
@@ -225,7 +224,7 @@ class MtcnnDetector(object):
         all_boxes = np.vstack(all_boxes)
 
         # merge the detection from first stage
-        keep = py_nms(all_boxes[:, 0:5], 0.7, 'Union')
+        keep = py_nms(all_boxes[:, 0:5], 0.7, 'Union') # apply nms to all scales input.
         all_boxes = all_boxes[keep]
         boxes = all_boxes[:, :5]
 

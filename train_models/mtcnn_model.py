@@ -20,14 +20,19 @@ def dense_to_one_hot(labels_dense,num_classes):
 #label:batch
 
 def cls_ohem(cls_prob, label):
+    '''
+	calculate the cls loss, binary cls loss.
+	'''
+	
     zeros = tf.zeros_like(label)
-    #label=-1 --> label=0net_factory
-    label_filter_invalid = tf.where(tf.less(label,0), zeros, label)
-    num_cls_prob = tf.size(cls_prob)
-    cls_prob_reshape = tf.reshape(cls_prob,[num_cls_prob,-1])
+    #label=-1 --> label=0 
+    label_filter_invalid = tf.where(tf.less(label,0), zeros, label) 
+    num_cls_prob = tf.size(cls_prob) # N*2
+    cls_prob_reshape = tf.reshape(cls_prob,[num_cls_prob,-1]) #(N*2, 1)
+    # cast the label to tf.int32
     label_int = tf.cast(label_filter_invalid,tf.int32)
-    num_row = tf.to_int32(cls_prob.get_shape()[0])
-    row = tf.range(num_row)*2
+    num_row = tf.to_int32(cls_prob.get_shape()[0]) # N
+    row = tf.range(num_row)*2 # sequence, (N, ), range(0, 2N, 2)
     indices_ = row + label_int
     label_prob = tf.squeeze(tf.gather(cls_prob_reshape, indices_))
     loss = -tf.log(label_prob+1e-10)
@@ -40,6 +45,7 @@ def cls_ohem(cls_prob, label):
     loss = loss * valid_inds
     loss,_ = tf.nn.top_k(loss, k=keep_num)
     return tf.reduce_mean(loss)
+	
 def bbox_ohem_smooth_L1_loss(bbox_pred,bbox_target,label):
     sigma = tf.constant(1.0)
     threshold = 1.0/(sigma**2)
@@ -119,26 +125,28 @@ def P_Net(inputs,label=None,bbox_target=None,landmark_target=None,training=True)
                         biases_initializer=tf.zeros_initializer(),
                         weights_regularizer=slim.l2_regularizer(0.0005), 
                         padding='valid'):
-        print inputs.get_shape()
-        net = slim.conv2d(inputs, 10, 3, stride=1,scope='conv1')
-        print net.get_shape()
+        #print(inputs.get_shape())
+		#net = inputs
+        #net = slim.conv2d(inputs, num_outputs=10, kernel_size=[3,3], stride=1, scope='conv1')
+        net = slim.conv2d(inputs, 10, [3, 3], stride=1, scope='conv1')
+		#print(net.get_shape())
         net = slim.max_pool2d(net, kernel_size=[2,2], stride=2, scope='pool1', padding='SAME')
-        print net.get_shape()
+        #print(net.get_shape())
         net = slim.conv2d(net,num_outputs=16,kernel_size=[3,3],stride=1,scope='conv2')
-        print net.get_shape()
+        #print(net.get_shape())
         net = slim.conv2d(net,num_outputs=32,kernel_size=[3,3],stride=1,scope='conv3')
-        print net.get_shape()
+        #print(net.get_shape())
         #batch*H*W*2
         conv4_1 = slim.conv2d(net,num_outputs=2,kernel_size=[1,1],stride=1,scope='conv4_1',activation_fn=tf.nn.softmax)
         #conv4_1 = slim.conv2d(net,num_outputs=1,kernel_size=[1,1],stride=1,scope='conv4_1',activation_fn=tf.nn.sigmoid)
         
-        print conv4_1.get_shape()
+        #print(conv4_1.get_shape())
         #batch*H*W*4
         bbox_pred = slim.conv2d(net,num_outputs=4,kernel_size=[1,1],stride=1,scope='conv4_2',activation_fn=None)
-        print bbox_pred.get_shape()
+        #print bbox_pred.get_shape()
         #batch*H*W*10
         landmark_pred = slim.conv2d(net,num_outputs=10,kernel_size=[1,1],stride=1,scope='conv4_3',activation_fn=None)
-        print landmark_pred.get_shape()
+        #print(landmark_pred.get_shape())
         #cls_prob_original = conv4_1 
         #bbox_pred_original = bbox_pred
         if training:
@@ -170,30 +178,30 @@ def R_Net(inputs,label=None,bbox_target=None,landmark_target=None,training=True)
                         biases_initializer=tf.zeros_initializer(),
                         weights_regularizer=slim.l2_regularizer(0.0005),                        
                         padding='valid'):
-        print inputs.get_shape()
+        print(inputs.get_shape())
         net = slim.conv2d(inputs, num_outputs=28, kernel_size=[3,3], stride=1, scope="conv1")
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.max_pool2d(net, kernel_size=[3, 3], stride=2, scope="pool1", padding='SAME')
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.conv2d(net,num_outputs=48,kernel_size=[3,3],stride=1,scope="conv2")
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.max_pool2d(net,kernel_size=[3,3],stride=2,scope="pool2")
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.conv2d(net,num_outputs=64,kernel_size=[2,2],stride=1,scope="conv3")
-        print net.get_shape()
+        print(net.get_shape())
         fc_flatten = slim.flatten(net)
-        print fc_flatten.get_shape()
+        print(fc_flatten.get_shape())
         fc1 = slim.fully_connected(fc_flatten, num_outputs=128,scope="fc1", activation_fn=prelu)
-        print fc1.get_shape()
+        print(fc1.get_shape())
         #batch*2
         cls_prob = slim.fully_connected(fc1,num_outputs=2,scope="cls_fc",activation_fn=tf.nn.softmax)
-        print cls_prob.get_shape()
+        print(cls_prob.get_shape())
         #batch*4
         bbox_pred = slim.fully_connected(fc1,num_outputs=4,scope="bbox_fc",activation_fn=None)
-        print bbox_pred.get_shape()
+        print(bbox_pred.get_shape())
         #batch*10
         landmark_pred = slim.fully_connected(fc1,num_outputs=10,scope="landmark_fc",activation_fn=None)
-        print landmark_pred.get_shape()
+        print(landmark_pred.get_shape())
         #train
         if training:
             cls_loss = cls_ohem(cls_prob,label)
@@ -212,34 +220,34 @@ def O_Net(inputs,label=None,bbox_target=None,landmark_target=None,training=True)
                         biases_initializer=tf.zeros_initializer(),
                         weights_regularizer=slim.l2_regularizer(0.0005),                        
                         padding='valid'):
-        print inputs.get_shape()
+        print(inputs.get_shape())
         net = slim.conv2d(inputs, num_outputs=32, kernel_size=[3,3], stride=1, scope="conv1")
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.max_pool2d(net, kernel_size=[3, 3], stride=2, scope="pool1", padding='SAME')
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.conv2d(net,num_outputs=64,kernel_size=[3,3],stride=1,scope="conv2")
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.max_pool2d(net, kernel_size=[3, 3], stride=2, scope="pool2")
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.conv2d(net,num_outputs=64,kernel_size=[3,3],stride=1,scope="conv3")
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.max_pool2d(net, kernel_size=[2, 2], stride=2, scope="pool3", padding='SAME')
-        print net.get_shape()
+        print(net.get_shape())
         net = slim.conv2d(net,num_outputs=128,kernel_size=[2,2],stride=1,scope="conv4")
-        print net.get_shape()               
+        print(net.get_shape())               
         fc_flatten = slim.flatten(net)
-        print fc_flatten.get_shape()
+        print(fc_flatten.get_shape())
         fc1 = slim.fully_connected(fc_flatten, num_outputs=256,scope="fc1", activation_fn=prelu)
-        print fc1.get_shape()
+        print(fc1.get_shape())
         #batch*2
         cls_prob = slim.fully_connected(fc1,num_outputs=2,scope="cls_fc",activation_fn=tf.nn.softmax)
-        print cls_prob.get_shape()
+        print(cls_prob.get_shape())
         #batch*4
         bbox_pred = slim.fully_connected(fc1,num_outputs=4,scope="bbox_fc",activation_fn=None)
-        print bbox_pred.get_shape()
+        print(bbox_pred.get_shape())
         #batch*10
         landmark_pred = slim.fully_connected(fc1,num_outputs=10,scope="landmark_fc",activation_fn=None)
-        print landmark_pred.get_shape()        
+        print(landmark_pred.get_shape())        
         #train
         if training:
             cls_loss = cls_ohem(cls_prob,label)

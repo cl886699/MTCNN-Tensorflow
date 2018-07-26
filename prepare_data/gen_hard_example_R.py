@@ -130,7 +130,7 @@ def t_net(prefix, epoch,
     detectors = [None, None, None]
     print("Test model: ", test_mode)
     #PNet-echo
-    model_path = ['%s-%s' % (x, y) for x, y in zip(prefix, epoch)]
+    model_path = ['%s-%s' % (prefix, epoch)]
     print(model_path[0])
     # load pnet model
     if slide_window:
@@ -166,7 +166,7 @@ def t_net(prefix, epoch,
     #list
     detections,_ = mtcnn_detector.detect_face(test_data)
 
-    save_net = 'RNet'
+    #save_net = 'RNet'
     if test_mode == "PNet":
         save_net = "RNet"
     elif test_mode == "RNet":
@@ -182,33 +182,6 @@ def t_net(prefix, epoch,
         pickle.dump(detections, f,1)
     print("%s测试完成开始OHEM" % image_size)
     save_hard_example(image_size, data, save_path)
-
-
-def parse_args():
-    parser = argparse.ArgumentParser(description='Test mtcnn',
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--test_mode', dest='test_mode', help='test net type, can be pnet, rnet or onet',
-                        default='RNet', type=str)
-    parser.add_argument('--prefix', dest='prefix', help='prefix of model name', nargs="+",
-                        default=['../data/MTCNN_model/PNet_landmark/PNet', '../data/MTCNN_model/RNet_landmark/RNet', '../data/MTCNN_model/ONet/ONet'],
-                        type=str)
-    parser.add_argument('--epoch', dest='epoch', help='epoch number of model to load', nargs="+",
-                        default=[18, 14, 22], type=int)
-    parser.add_argument('--batch_size', dest='batch_size', help='list of batch size used in prediction', nargs="+",
-                        default=[2048, 256, 16], type=int)
-    parser.add_argument('--thresh', dest='thresh', help='list of thresh for pnet, rnet, onet', nargs="+",
-                        default=[0.4, 0.05, 0.7], type=float)
-    parser.add_argument('--min_face', dest='min_face', help='minimum face size for detection',
-                        default=24, type=int)
-    parser.add_argument('--stride', dest='stride', help='stride of sliding window',
-                        default=2, type=int)
-    parser.add_argument('--sw', dest='slide_window', help='use sliding window in pnet', action='store_true')
-    # parser.add_argument('--gpu', dest='gpu_id', help='GPU device to train with',
-    #                     default=0, type=int)
-    parser.add_argument('--shuffle', dest='shuffle', help='shuffle data on visualization', action='store_true')
-    # parser.add_argument('--vis', dest='vis', help='turn on visualization', action='store_true')
-    args = parser.parse_args()
-    return args
 
 
 if __name__ == '__main__':
@@ -230,17 +203,25 @@ if __name__ == '__main__':
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-    args = parse_args()
+    prefix = '../data/MTCNN_yin_model/PNet/PNet'
+    epoch = 30
+    batch_size = 128
+    test_mode = 'PNet'
+    min_face = 40
+    thresh=[0.6, 0.6, 0.7]
+    min_face_size=25
+    stride=2
+    slide_window=False
+    shuffle=False
+    vis=False
 
-    print('Called with argument:')
-    print(args)
-    t_net(args.prefix,#model param's file
-          args.epoch, #final epoches
-          args.batch_size, #test batch_size 
-          args.test_mode,#test which model
-          args.thresh, #cls threshold
-          args.min_face, #min_face
-          args.stride,#stride
-          args.slide_window, 
-          args.shuffle, 
+    t_net(prefix,#model param's file
+          epoch, #final epoches
+          batch_size, #test batch_size 
+          test_mode,#test which model
+          thresh, #cls threshold
+          min_face, #min_face
+          stride,#stride
+          slide_window, 
+          shuffle, 
           vis=False)

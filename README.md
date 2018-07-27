@@ -8,7 +8,7 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 ## Dependencies
 * Tensorflow 1.2.1
 * TF-Slim
-* Python 2.7
+* Python 3.5
 * Ubuntu 16.04
 * Cuda 8.0
 

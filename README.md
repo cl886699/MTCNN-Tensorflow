@@ -23,7 +23,8 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 2. Run `gen_RNet_pos_tfrecords.py` to generate pos tfrecords for **RNet**.
 3. Run `gen_RNet_part_tfrecords.py` to generate part tfrecords for **RNet**.
 4. Run `gen_RNet_neg_tfrecords.py` to generate neg tfrecords for **RNet**.
-**total 3 tfrecords for RNet training**
+
+5. **total 3 tfrecords for RNet training**
 
 ### prepare Rnet data
 1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.

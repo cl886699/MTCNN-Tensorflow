@@ -20,8 +20,10 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 4. Run `gen_PNet_tfrecords.py` to generate tfrecord for **PNet**.
 ### prepare Rnet data(no landmark data)
 1. After training **PNet**, run `gen_hard_example_R.py` to generate training data(Face Detection Part) for **RNet**.
-2. Run `gen_imglist_rnet.py` to merge positive, negative and part data, ensure pos:part:neg=1:1:3
-3. Run `gen_RNet_tfrecords.py` to generate tfrecords for **RNet**.(**you should run this script four times to generate tfrecords of neg,pos and part respectively**)
+2. Run `gen_RNet_pos_tfrecords.py` to generate pos tfrecords for **RNet**.
+3. Run `gen_RNet_part_tfrecords.py` to generate part tfrecords for **RNet**.
+4. Run `gen_RNet_neg_tfrecords.py` to generate neg tfrecords for **RNet**.
+**total 3 tfrecords for RNet training**
 
 ### prepare Rnet data
 1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.

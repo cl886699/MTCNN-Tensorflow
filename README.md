@@ -28,6 +28,11 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 
 ### prepare ONet data(no landmark version)
 1. After training **RNet**, run `gen_hard_example_O.py` to generate training data(Face Detection Part) for **ONet**.
+2. Run `gen_ONet_pos_tfrecords.py` to generate pos tfrecords for **ONet**.
+3. Run `gen_ONet_part_tfrecords.py` to generate part tfrecords for **ONet**.
+4. Run `gen_ONet_neg_tfrecords.py` to generate neg tfrecords for **ONet**.
+
+5. **total 3 tfrecords for ONet training**
 
 ### prepare Rnet data
 1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.
@@ -48,8 +53,10 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 ## training
 1. Run `train_models/train_PNet.py` to train PNet.
 2. Run `train_models/train_RNet.py` to train RNet.
+3. Run `train_models/train_ONet.py` to train ONet.
 
-## Some Details
+## Some Detail
+* Two version of model was trained, first version has no landmark.
 * When training **PNet**,I merge four parts of data(pos,part,neg) into one tfrecord,since their total number radio is almost 1:1:3.But when training **RNet** , I generate 3 tfrecords,since their total number is not balanced.During training,I read 16 samples from pos and part tfrecord, and read 32 samples from neg tfrecord to construct mini-batch. When training **ONet**,I generate four tfrecords,since their total number is not balanced.During training,I read 16 samples from pos,part and landmark tfrecord and read 32 samples from neg tfrecord to construct mini-batch.
 * It's important for **PNet** and **RNet** to keep high recall radio.When using well-trained **PNet** to generate training data for **RNet**,I can get 14w+ pos samples.When using well-trained **RNet** to generate training data for **ONet**,I can get 19w+ pos samples.
 * Since **MTCNN** is a Multi-task Network,we should pay attention to the format of training data.The format is:

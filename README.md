@@ -44,8 +44,10 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 
 ## training
 1. Run `train_models/train_PNet.py` to train PNet.
+2. Run `train_models/train_RNet.py` to train RNet.
+
 ## Some Details
-* When training **PNet**,I merge four parts of data(pos,part,landmark,neg) into one tfrecord,since their total number radio is almost 1:1:1:3.But when training **RNet** and **ONet**,I generate four tfrecords,since their total number is not balanced.During training,I read 64 samples from pos,part and landmark tfrecord and read 192 samples from neg tfrecord to construct mini-batch.
+* When training **PNet**,I merge four parts of data(pos,part,neg) into one tfrecord,since their total number radio is almost 1:1:3.But when training **RNet** , I generate 3 tfrecords,since their total number is not balanced.During training,I read 16 samples from pos and part tfrecord, and read 32 samples from neg tfrecord to construct mini-batch. When training **ONet**,I generate four tfrecords,since their total number is not balanced.During training,I read 16 samples from pos,part and landmark tfrecord and read 32 samples from neg tfrecord to construct mini-batch.
 * It's important for **PNet** and **RNet** to keep high recall radio.When using well-trained **PNet** to generate training data for **RNet**,I can get 14w+ pos samples.When using well-trained **RNet** to generate training data for **ONet**,I can get 19w+ pos samples.
 * Since **MTCNN** is a Multi-task Network,we should pay attention to the format of training data.The format is:
  

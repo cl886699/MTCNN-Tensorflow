@@ -26,6 +26,9 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 
 5. **total 3 tfrecords for RNet training**
 
+### prepare ONet data(no landmark version)
+1. After training **RNet**, run `gen_hard_example_O.py` to generate training data(Face Detection Part) for **ONet**.
+
 ### prepare Rnet data
 1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.
 2. Download landmark training data from [here]((http://mmlab.ie.cuhk.edu.hk/archive/CNN_FacePoint.htm)),unzip and put them into `prepare_data` folder.

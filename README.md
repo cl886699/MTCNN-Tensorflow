@@ -8,7 +8,7 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 ## Dependencies
 * Tensorflow 1.2.1
 * TF-Slim
-* Python 2.7
+* Python 3.5
 * Ubuntu 16.04
 * Cuda 8.0
 
@@ -20,8 +20,19 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 4. Run `gen_PNet_tfrecords.py` to generate tfrecord for **PNet**.
 ### prepare Rnet data(no landmark data)
 1. After training **PNet**, run `gen_hard_example_R.py` to generate training data(Face Detection Part) for **RNet**.
-2. Run `gen_imglist_rnet.py` to merge positive, negative and part data.
-3. Run `gen_RNet_tfrecords.py` to generate tfrecords for **RNet**.(**you should run this script four times to generate tfrecords of neg,pos and part respectively**)
+2. Run `gen_RNet_pos_tfrecords.py` to generate pos tfrecords for **RNet**.
+3. Run `gen_RNet_part_tfrecords.py` to generate part tfrecords for **RNet**.
+4. Run `gen_RNet_neg_tfrecords.py` to generate neg tfrecords for **RNet**.
+
+5. **total 3 tfrecords for RNet training**
+
+### prepare ONet data(no landmark version)
+1. After training **RNet**, run `gen_hard_example_O.py` to generate training data(Face Detection Part) for **ONet**.
+2. Run `gen_ONet_pos_tfrecords.py` to generate pos tfrecords for **ONet**.
+3. Run `gen_ONet_part_tfrecords.py` to generate part tfrecords for **ONet**.
+4. Run `gen_ONet_neg_tfrecords.py` to generate neg tfrecords for **ONet**.
+
+5. **total 3 tfrecords for ONet training**
 
 ### prepare Rnet data
 1. Download Wider Face Training part only from Official Website , unzip to replace `WIDER_train` and put it into `prepare_data` folder.
@@ -41,8 +52,12 @@ This work is used for reproduce MTCNN,a Joint Face Detection and Alignment using
 
 ## training
 1. Run `train_models/train_PNet.py` to train PNet.
-## Some Details
-* When training **PNet**,I merge four parts of data(pos,part,landmark,neg) into one tfrecord,since their total number radio is almost 1:1:1:3.But when training **RNet** and **ONet**,I generate four tfrecords,since their total number is not balanced.During training,I read 64 samples from pos,part and landmark tfrecord and read 192 samples from neg tfrecord to construct mini-batch.
+2. Run `train_models/train_RNet.py` to train RNet.
+3. Run `train_models/train_ONet.py` to train ONet.
+
+## Some Detail
+* Two version of model was trained, first version has no landmark.
+* When training **PNet**,I merge four parts of data(pos,part,neg) into one tfrecord,since their total number radio is almost 1:1:3.But when training **RNet** , I generate 3 tfrecords,since their total number is not balanced.During training,I read 16 samples from pos and part tfrecord, and read 32 samples from neg tfrecord to construct mini-batch. When training **ONet**,I generate four tfrecords,since their total number is not balanced.During training,I read 16 samples from pos,part and landmark tfrecord and read 32 samples from neg tfrecord to construct mini-batch.
 * It's important for **PNet** and **RNet** to keep high recall radio.When using well-trained **PNet** to generate training data for **RNet**,I can get 14w+ pos samples.When using well-trained **RNet** to generate training data for **ONet**,I can get 19w+ pos samples.
 * Since **MTCNN** is a Multi-task Network,we should pay attention to the format of training data.The format is:
  

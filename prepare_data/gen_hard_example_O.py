@@ -132,7 +132,7 @@ def t_net(prefix, epoch,
     detectors = [None, None, None]
     print("Test model: ", test_mode)
     #PNet-echo
-    model_path = ['%s-%s' % (prefix, epoch)]
+    model_path = ['%s-%s' % (prefix[0], epoch[0]), '%s-%s' %(prefix[1], epoch[1])]
     print(model_path[0])
     # load pnet model
     if slide_window:
@@ -188,7 +188,7 @@ def t_net(prefix, epoch,
 
 if __name__ == '__main__':
 
-    net = 'RNet'
+    net = 'ONet'
     if net == "RNet":
         image_size = 24
     if net == "ONet":
@@ -205,10 +205,10 @@ if __name__ == '__main__':
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-    prefix = '../data/MTCNN_yin_model/PNet/PNet'
-    epoch = 30
-    batch_size = 256
-    test_mode = 'PNet'
+    prefix = ['../data/MTCNN_yin_model/PNet/PNet', '../data/MTCNN_yin_model/RNet/RNet']
+    epoch = [30, 22]
+    batch_size = [256, 64]
+    test_mode = 'RNet'
     min_face = 40
     thresh=[0.6, 0.6, 0.7]
     min_face_size=40

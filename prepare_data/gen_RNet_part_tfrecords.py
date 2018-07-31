@@ -32,7 +32,7 @@ def _get_output_filename(output_dir, name, net):
     #return '%s/%s_%s_%s.tfrecord' % (output_dir, name, net, st)
     #return '%s/train_PNet_landmark.tfrecord' % (output_dir)
     #return '%s/landmark_landmark.tfrecord' % (output_dir)
-    return '%s/pos_landmark.tfrecord' % (output_dir)
+    return '%s/part_landmark.tfrecord' % (output_dir)
 
 def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
     """Runs the conversion operation.
@@ -44,6 +44,7 @@ def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
     
     #tfrecord name 
     tf_filename = _get_output_filename(output_dir, name, net)
+    #os.mkdir(output_dir)
     if tf.gfile.Exists(tf_filename):
         print('Dataset files already exist. Exiting without re-creating them.')
         return
@@ -72,7 +73,7 @@ def run(dataset_dir, net, output_dir, name='MTCNN', shuffling=False):
 
 def get_dataset(dir, net='PNet'):
     #item = 'imglists/PNet/train_%s_raw.txt' % net
-    item = 'imglists/RNet/train_%s_landmark.txt' % net
+    item = '24/part_24.txt'
     #item = '%s/landmark_%s_aug.txt' % (net,net)
     print(item)
     dataset_dir = os.path.join(dir, item)
@@ -84,7 +85,7 @@ def get_dataset(dir, net='PNet'):
         data_example = dict()
         bbox = dict()
         data_example['filename'] = info[0]
-        data_example['label'] = int(info[1])
+        data_example['label'] = 0
         bbox['xmin'] = 0
         bbox['ymin'] = 0
         bbox['xmax'] = 0

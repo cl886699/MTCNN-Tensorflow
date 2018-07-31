@@ -140,10 +140,14 @@ class MtcnnDetector(object):
                 start point of the bbox in target image
             edy, edx : numpy array, n x 1
                 end point of the bbox in target image
+	    target image size: (tmph, tmpw)
+
             y, x : numpy array, n x 1
                 start point of the bbox in original image
             ex, ex : numpy array, n x 1
                 end point of the bbox in original image
+	    original image size: (h, w)
+
             tmph, tmpw: numpy array, n x 1
                 height and width of the bbox
         """
@@ -205,7 +209,7 @@ class MtcnnDetector(object):
             #cls_cls_map : H*w*2
             #reg: H*w*4
             cls_cls_map, reg = self.pnet_detector.predict(im_resized)
-            #boxes: num*9(x1,y1,x2,y2,score,x1_offset,y1_offset,x2_offset,y2_offset)
+            #boxes: num*9, (x1,y1,x2,y2,score,x1_offset,y1_offset,x2_offset,y2_offset)
             boxes = self.generate_bbox(cls_cls_map[:, :,1], reg, current_scale, self.thresh[0])
 
             current_scale *= self.scale_factor
@@ -342,6 +346,8 @@ class MtcnnDetector(object):
         boxes_c = boxes_c[keep]
         landmark = landmark[keep]
         return boxes, boxes_c,landmark
+
+
     #use for video
     def detect(self, img):
         """Detect face over image
@@ -387,9 +393,12 @@ class MtcnnDetector(object):
         all_boxes = []#save each image's bboxes
         landmarks = []
         batch_idx = 0
-        sum_time = 0
+        #sum_time = 0
         #test_data is iter_
+        data_count = 0
         for databatch in test_data:
+            sum_time = 0 # count total time for 1 batch.
+            data_count += 1
             #databatch(image returned)
             if batch_idx % 100 == 0:
                 print("%d images done" % batch_idx)
@@ -425,6 +434,7 @@ class MtcnnDetector(object):
             # onet
             t3 = 0
             if self.onet_detector:
+                #print(data_count)
                 t = time.time()
                 boxes, boxes_c, landmark = self.detect_onet(im, boxes_c)
                 t3 = time.time() - t
@@ -434,13 +444,13 @@ class MtcnnDetector(object):
                     landmarks.append(np.array([]))                    
                     batch_idx += 1
                     continue
-                print(
-                    "time cost " + '{:.3f}'.format(sum_time) + '  pnet {:.3f}  rnet {:.3f}  onet {:.3f}'.format(t1, t2,t3))
+                print("time cost " + '{:.3f}'.format(sum_time) + '  pnet {:.3f}  rnet {:.3f}  onet {:.3f}'.format(t1, t2,t3))
                                                                                                                     
                                                                                                                    
             all_boxes.append(boxes_c)
             landmarks.append(landmark)
             batch_idx += 1
+        print('total image: ',data_count)
         #num_of_data*9,num_of_data*10
         return all_boxes,landmarks
 

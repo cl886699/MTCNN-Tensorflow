@@ -19,8 +19,8 @@ def train_RNet(base_dir, prefix, end_epoch, display, lr):
 if __name__ == '__main__':
     base_dir = '../prepare_data/imglists/RNet'
 
-    model_name = 'MTCNN'
-    model_path = '../data/%s_model/RNet_landmark/RNet' % model_name
+    model_name = 'MTCNN_yin'
+    model_path = '../data/%s_model/RNet' % model_name
     prefix = model_path
     end_epoch = 22
     display = 1000

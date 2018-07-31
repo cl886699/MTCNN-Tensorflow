@@ -60,6 +60,7 @@ def bbox_ohem_smooth_L1_loss(bbox_pred,bbox_target,label):
     _, k_index = tf.nn.top_k(smooth_loss, k=keep_num)
     smooth_loss_picked = tf.gather(smooth_loss, k_index)
     return tf.reduce_mean(smooth_loss_picked)
+
 def bbox_ohem_orginal(bbox_pred,bbox_target,label):
     zeros_index = tf.zeros_like(label, dtype=tf.float32)
     #pay attention :there is a bug!!!!
@@ -73,6 +74,7 @@ def bbox_ohem_orginal(bbox_pred,bbox_target,label):
     _, k_index = tf.nn.top_k(square_error, k=keep_num)
     square_error = tf.gather(square_error, k_index)
     return tf.reduce_mean(square_error)
+
 #label=1 or label=-1 then do regression
 def bbox_ohem(bbox_pred,bbox_target,label):
     zeros_index = tf.zeros_like(label, dtype=tf.float32)

@@ -19,8 +19,8 @@ def train_ONet(base_dir, prefix, end_epoch, display, lr):
 if __name__ == '__main__':
     base_dir = '../prepare_data/imglists/ONet'
 
-    model_name = 'MTCNN'
-    model_path = '../data/%s_model/ONet_landmark/ONet' % model_name
+    model_name = 'MTCNN_yin'
+    model_path = '../data/%s_model/ONet' % model_name
     prefix = model_path
     end_epoch = 22
     display = 10

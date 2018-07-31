@@ -91,14 +91,47 @@ def train(net_factory, prefix, end_epoch, base_dir,
     :return:
     """
     net = prefix.split('/')[-1]
-    #label file
-    label_file = os.path.join(base_dir,'train_%s_landmark.txt' % net)
-    #label_file = os.path.join(base_dir,'landmark_12_few.txt')
-    print(label_file)
-    f = open(label_file, 'r')
-    num = len(f.readlines())
+    if net == 'PNet':
+        #label file
+        label_file = os.path.join(base_dir,'train_%s_landmark.txt' % net)
+        #label_file = os.path.join(base_dir,'landmark_12_few.txt')
+        print(label_file)
+        f = open(label_file, 'r')
+        num = len(f.readlines())
+    elif net == 'RNet':
+        #positive label file.
+        pos_label_file = '../prepare_data/24/pos_24.txt'
+        neg_label_file = '../prepare_data/24/neg_24.txt'
+        part_label_file = '../prepare_data/24/part_24.txt'
+        f1 = open(pos_label_file, 'r')
+        pos_num = len(f1.readlines())
+        f2 = open(neg_label_file, 'r')
+        neg_num = len(f2.readlines())
+        f3 = open(part_label_file, 'r')
+        part_num = len(f3.readlines())
+        # total training samples
+        num = pos_num + neg_num + part_num
+    elif net == 'ONet':
+        #positive label file.
+        pos_label_file = '../prepare_data/48/pos_48.txt'
+        neg_label_file = '../prepare_data/48/neg_48.txt'
+        part_label_file = '../prepare_data/48/part_48.txt'
+        f1 = open(pos_label_file, 'r')
+        pos_num = len(f1.readlines())
+        f2 = open(neg_label_file, 'r')
+        neg_num = len(f2.readlines())
+        f3 = open(part_label_file, 'r')
+        part_num = len(f3.readlines())
+        # total training samples
+        num = pos_num + neg_num + part_num
+
     print("Total datasets is: ", num)
     print(prefix)
+
+
+    # check prefix file exist.
+    if os.path.exists(prefix) == False:
+        os.mkdir(prefix)
 
     #PNet use this method to get data
     if net == 'PNet':
@@ -108,23 +141,24 @@ def train(net_factory, prefix, end_epoch, base_dir,
         image_batch, label_batch, bbox_batch,landmark_batch = read_single_tfrecord(dataset_dir, config.BATCH_SIZE, net)
         
     #RNet use 3 tfrecords to get data    
-    else:
+    elif net in ['RNet', 'ONet']:
         pos_dir = os.path.join(base_dir,'pos_landmark.tfrecord_shuffle')
         part_dir = os.path.join(base_dir,'part_landmark.tfrecord_shuffle')
         neg_dir = os.path.join(base_dir,'neg_landmark.tfrecord_shuffle')
-        landmark_dir = os.path.join(base_dir,'landmark_landmark.tfrecord_shuffle')
-        dataset_dirs = [pos_dir,part_dir,neg_dir,landmark_dir]
-        pos_radio = 1.0/6;part_radio = 1.0/6;landmark_radio=1.0/6;neg_radio=3.0/6
+        #landmark_dir = os.path.join(base_dir,'landmark_landmark.tfrecord_shuffle')
+        dataset_dirs = [pos_dir,part_dir,neg_dir]
+        pos_radio = 1.0/4;part_radio = 1.0/4;neg_radio=2.0/4
         pos_batch_size = int(np.ceil(config.BATCH_SIZE*pos_radio))
         assert pos_batch_size != 0,"Batch Size Error "
         part_batch_size = int(np.ceil(config.BATCH_SIZE*part_radio))
         assert part_batch_size != 0,"Batch Size Error "        
         neg_batch_size = int(np.ceil(config.BATCH_SIZE*neg_radio))
         assert neg_batch_size != 0,"Batch Size Error "
-        landmark_batch_size = int(np.ceil(config.BATCH_SIZE*landmark_radio))
-        assert landmark_batch_size != 0,"Batch Size Error "
-        batch_sizes = [pos_batch_size,part_batch_size,neg_batch_size,landmark_batch_size]
-        image_batch, label_batch, bbox_batch,landmark_batch = read_multi_tfrecords(dataset_dirs,batch_sizes, net)        
+        #landmark_batch_size = int(np.ceil(config.BATCH_SIZE*landmark_radio))
+        #assert landmark_batch_size != 0,"Batch Size Error "
+        batch_sizes = [pos_batch_size,part_batch_size,neg_batch_size]
+        image_batch, label_batch, bbox_batch, landmark_batch = read_multi_tfrecords(dataset_dirs,batch_sizes, net)
+
         
     #landmark_dir    
     if net == 'PNet':
@@ -177,7 +211,7 @@ def train(net_factory, prefix, end_epoch, base_dir,
             if coord.should_stop():
                 break
             image_batch_array, label_batch_array, bbox_batch_array,landmark_batch_array = sess.run([image_batch, label_batch, bbox_batch,landmark_batch])
-            #random flip
+            #random flip, data augmentation.
             image_batch_array,landmark_batch_array = random_flip_images(image_batch_array,label_batch_array,landmark_batch_array)
             '''
             print image_batch_array.shape

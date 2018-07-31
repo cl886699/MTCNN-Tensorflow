@@ -1,5 +1,5 @@
 import numpy as np
-import minibatch
+import prepare_data.minibatch
 import sys
 import cv2
 sys.path.append("../")
@@ -68,6 +68,7 @@ class TestLoader:
         #print len(imdb)
         #assert len(imdb) == 1, "Single batch only"
         im = cv2.imread(imdb)
+        im = cv2.resize(im, (640, 480), interpolation=cv2.INTER_LINEAR)
         self.data = im
 
 class ImageLoader:
